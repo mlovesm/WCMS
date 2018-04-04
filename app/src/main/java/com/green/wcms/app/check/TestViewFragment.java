@@ -1,4 +1,4 @@
-package com.green.wcms.app.draw;
+package com.green.wcms.app.check;
 
 import android.app.ProgressDialog;
 import android.graphics.Color;
@@ -6,14 +6,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
@@ -30,7 +32,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.green.wcms.app.R;
-import com.green.wcms.app.equipment.EquipmentViewFragment;
 import com.green.wcms.app.retrofit.Datas;
 import com.green.wcms.app.retrofit.RetrofitService;
 import com.green.wcms.app.util.UtilClass;
@@ -44,27 +45,66 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DrawViewFragment extends Fragment implements OnMapReadyCallback,
+/**
+ * Fragment Life Style
+ * 1. Fragment is added
+ * 2. onAttach()                    Fragment가 Activty에 붙을때 호출
+ * 3. onCreate()                    Activty에서의 onCreate()와 비슷하나, ui 관련 작업은 할 수 없다.
+ * 4. onCreateView()                Layout을 inflater을 하여 View 작업을 하는 곳
+ * 5. onActivityCreated()           Activity에서 Fragment를 모두 생성하고난 다음에 호출됨. Activty의 onCreate()에서 setContentView()한 다음과 같다
+ * 6. onStart()                     Fragment가 화면에 표시될때 호출, 사용자의 Action과 상호 작용이 불가능함
+ * 7. onResume()                    Fragment가 화면에 완전히 그렸으며, 사용자의 Action과 상호 작용이 가능함
+ * 8. Fragment is active
+ * 9. User navigates backward or fragment is removed/replaced  or Fragment is added to the back stack, then removed/replaced
+ * 10. onPause()
+ * 11. onStop()                     Fragment가 화면에서 더이상 보여지지 않게됬을때
+ * 12. onDestroy()                  View 리소스를 해제할수있도록 호출. backstack을 사용했다면 Fragment를 다시 돌아갈때 onCreateView()가 호출됨
+ * 13. onDetached()
+ * 14. Fragment is destroyed
+ */
+
+/**
+ * Google Map CallStack
+ * 1. onCreate()
+ * 2. onCreateView()
+ * 3. onActivityCreated()
+ * 4. onStart();
+ * 5. onResume();
+ * 5-2. onMapReady();
+ * 6. onPause();
+ * 7. onSaveInstanceState();
+ * 8. onMapReady();
+ */
+
+public class TestViewFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
-    private static final String TAG = "DrawViewFragment";
+    private static final String TAG = "TestViewFragment";
     private ProgressDialog pDlalog = null;
 
-    @Bind(R.id.textView1) TextView tv_data1;
-    @Bind(R.id.textView2) TextView tv_data2;
+    @Bind(R.id.fab) FloatingActionButton fab;
+    @Bind(R.id.fab1) FloatingActionButton fab1;
+    @Bind(R.id.fab2) FloatingActionButton fab2;
+
+    private Boolean isFabOpen = false;
+    private Animation fab_open,fab_close,rotate_forward,rotate_backward;
 
     private GoogleMap mMap;
+//    private MapView mapView = null;
     @Bind(R.id.map_view) MapView mapView;
     private MarkerOptions[] mMarkerArray;
     private LatLng[] markerPoint;
     private LatLngBounds.Builder bounds;
     private Marker lastClicked = null;
 
-
     private double latitd= 0.0;
     private double longtd= 0.0;
     private String idx="";
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
@@ -130,17 +170,18 @@ public class DrawViewFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        idx= getArguments().getString("draw_cd");
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.draw_map_view, container, false);
+        View view = inflater.inflate(R.layout.fragment_bestfood_map, container, false);
         ButterKnife.bind(this, view);
-        UtilClass.setToolbar(getActivity(), getArguments().getString("title"));
 
+        fab_open = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getActivity(),R.anim.fab_close);
+        rotate_forward = AnimationUtils.loadAnimation(getActivity(),R.anim.rotate_forward);
+        rotate_backward = AnimationUtils.loadAnimation(getActivity(),R.anim.rotate_backward);
+
+//        textTitle.setText(getArguments().getString("title"));
+//        idx= getArguments().getString("draw_cd");
+        idx= "2";
         async_progress_dialog();
 
         mapView.getMapAsync(this);
@@ -148,10 +189,54 @@ public class DrawViewFragment extends Fragment implements OnMapReadyCallback,
         return view;
     }//onCreateView
 
+    @OnClick({R.id.fab, R.id.fab1, R.id.fab2})
+    public void flotingAction(View v){
+        int id = v.getId();
+        switch (id){
+            case R.id.fab:
+
+                animateFAB();
+                break;
+            case R.id.fab1:
+
+                Log.d("Raj", "Fab 1");
+                break;
+            case R.id.fab2:
+
+                Log.d("Raj", "Fab 2");
+                break;
+        }
+    }
+
+    public void animateFAB(){
+
+        if(isFabOpen){
+
+            fab.startAnimation(rotate_backward);
+            fab1.startAnimation(fab_close);
+            fab2.startAnimation(fab_close);
+            fab1.setClickable(false);
+            fab2.setClickable(false);
+            isFabOpen = false;
+            Log.d("Raj", "close");
+
+        } else {
+
+            fab.startAnimation(rotate_forward);
+            fab1.startAnimation(fab_open);
+            fab2.startAnimation(fab_open);
+            fab1.setClickable(true);
+            fab2.setClickable(true);
+            isFabOpen = true;
+            Log.d("Raj","open");
+
+        }
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+        onSaveInstanceState(outState);
     }
 
     @Override
@@ -218,8 +303,8 @@ public class DrawViewFragment extends Fragment implements OnMapReadyCallback,
                         }
                         UtilClass.logD(TAG, "CRUD_DATE="+jsonArray.getJSONObject(0).get("CRUD_DATE").toString());
 //                        UtilClass.logD(TAG, "CRUD_DATE="+UtilClass.jsonDateConverter(jsonArray.getJSONObject(0).get("CRUD_DATE").toString()));
-                        tv_data1.setText(jsonArray.getJSONObject(0).get("DRAW_CD").toString());
-                        tv_data2.setText(jsonArray.getJSONObject(0).get("DRAW_NM").toString());
+//                        tv_data1.setText(jsonArray.getJSONObject(0).get("DRAW_CD").toString());
+//                        tv_data2.setText(jsonArray.getJSONObject(0).get("DRAW_NM").toString());
 
                     } catch ( Exception e ) {
                         e.printStackTrace();
@@ -347,20 +432,8 @@ public class DrawViewFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Fragment frag = null;
-        Bundle bundle = new Bundle();
 
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fm.beginTransaction();
-        fragmentTransaction.replace(R.id.fragmentReplace, frag = new EquipmentViewFragment());
-        bundle.putString("title","장치관리상세");
-        bundle.putString("equip_no", marker.getSnippet());
-
-        frag.setArguments(bundle);
-        fragmentTransaction.addToBackStack("도면관리상세");
-        fragmentTransaction.commit();
-
-//        Toast.makeText(getActivity(), "Click Info Window="+marker.getSnippet()+", "+marker.getZIndex(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Click Info Window="+marker.getSnippet()+", "+marker.getZIndex(), Toast.LENGTH_SHORT).show();
     }
 
 

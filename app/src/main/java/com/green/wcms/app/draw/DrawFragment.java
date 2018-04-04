@@ -2,11 +2,15 @@ package com.green.wcms.app.draw;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -40,11 +44,11 @@ import retrofit2.Response;
 public class DrawFragment extends Fragment {
     private static final String TAG = "DrawFragment";
     private ProgressDialog pDlalog = null;
+    private String title;
 
     private ArrayList<HashMap<String,Object>> arrayList;
     private DrawAdapter mAdapter;
     @Bind(R.id.listView1) ListView listView;
-    @Bind(R.id.top_title) TextView textTitle;
 
     @Bind(R.id.search_top) LinearLayout layout;
     @Bind(R.id.search_spi) Spinner search_spi;
@@ -52,12 +56,17 @@ public class DrawFragment extends Fragment {
     String search_column;	//검색 컬럼
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        title= getArguments().getString("title");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.map_list, container, false);
         ButterKnife.bind(this, view);
 
-        textTitle.setText(getArguments().getString("title"));
-//        view.findViewById(R.id.top_search).setVisibility(View.VISIBLE);
         layout.setVisibility(View.GONE);
 
         async_progress_dialog();
@@ -117,11 +126,6 @@ public class DrawFragment extends Fragment {
         });
     }
 
-    @OnClick(R.id.top_home)
-    public void goHome() {
-        UtilClass.goHome(getActivity());
-    }
-
     //ListView의 item (상세)
     private class ListViewItemClickListener implements AdapterView.OnItemClickListener {
         @Override
@@ -132,12 +136,12 @@ public class DrawFragment extends Fragment {
             FragmentManager fm = getFragmentManager();
             FragmentTransaction fragmentTransaction = fm.beginTransaction();
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new DrawViewFragment());
-            bundle.putString("title","도면관리상세");
+            bundle.putString("title",title+"상세");
             String key= arrayList.get(position).get("key").toString();
             bundle.putString("draw_cd", key);
 
             frag.setArguments(bundle);
-            fragmentTransaction.addToBackStack("도면관리상세");
+            fragmentTransaction.addToBackStack(title+"상세");
             fragmentTransaction.commit();
         }
     }

@@ -6,23 +6,23 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.green.wcms.app.R;
@@ -36,20 +36,11 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,6 +50,7 @@ public class MsdsFragment extends Fragment {
     private static final String TAG = "MsdsFragment";
     private ProgressDialog pDlalog = null;
     private RetrofitService service;
+    private String title;
     private PermissionListener permissionlistener;
 
     private ArrayList<HashMap<String,Object>> arrayList;
@@ -67,13 +59,19 @@ public class MsdsFragment extends Fragment {
     private String fileSize;
     private String fileDir;
     @Bind(R.id.listView1) ListView listView;
-    @Bind(R.id.top_title) TextView textTitle;
 
     @Bind(R.id.search_top) LinearLayout layout;
     @Bind(R.id.editText1) EditText et_search;
-    String search_column;	//검색 컬럼
 
     private SettingPreference pref;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        title= getArguments().getString("title");
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -83,7 +81,6 @@ public class MsdsFragment extends Fragment {
         pref = new SettingPreference("loginData",getActivity());
         fileDir= Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator  + "Download" + File.separator;
 
-        textTitle.setText(getArguments().getString("title"));
         layout.setVisibility(View.GONE);
 
         async_progress_dialog();
@@ -92,6 +89,24 @@ public class MsdsFragment extends Fragment {
 
         return view;
     }//onCreateView
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_write, menu);
+        menu.findItem(R.id.action_write).setVisible(false);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_write) {
+
+        }else if (item.getItemId() == R.id.action_search) {
+            UtilClass.getSearch(layout);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public void async_progress_dialog(){
         RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
@@ -144,11 +159,6 @@ public class MsdsFragment extends Fragment {
             }
         });
 
-    }
-
-    @OnClick(R.id.top_home)
-    public void goHome() {
-        UtilClass.goHome(getActivity());
     }
 
     //ListView의 item (상세)
@@ -256,48 +266,6 @@ public class MsdsFragment extends Fragment {
             Toast.makeText(getActivity(), "해당 파일이 없습니다.", Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    public void openFile(String contentsPath) {
-        File file = new File(contentsPath);
-
-        if(file.exists()) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            if (intent.resolveActivity(getActivity().getPackageManager()) == null) {
-                Toast.makeText(getActivity(), "This Application do not have Camera Application", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Uri path = null;
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-                try {
-                    path = FileProvider.getUriForFile(getActivity(), getActivity().getApplicationContext().getPackageName() + ".provider", file);
-                    UtilClass.logD(TAG, "path="+ path);
-//                    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                    List<ResolveInfo> resolvedIntentActivities = getContext().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-                    for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
-                        String packageName = resolvedIntentInfo.activityInfo.packageName;
-                        getContext().grantUriPermission(packageName, path, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
-            }else{
-                path = Uri.fromFile(file);
-                UtilClass.logD(TAG, "path="+ path);
-            }
-            intent.setDataAndType(path, "application/pdf");
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-            try {
-                startActivity(intent);
-            } catch (ActivityNotFoundException ex){
-                Toast.makeText(getActivity(), "파일을 보기 위한 앱이 없습니다.", Toast.LENGTH_SHORT).show();
-            }
-        }else{
-            Toast.makeText(getActivity(), "해당 파일이 없습니다.", Toast.LENGTH_SHORT).show();
-        }
     }
 
     //파일 다운로드

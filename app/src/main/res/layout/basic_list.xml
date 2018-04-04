@@ -10,12 +10,5 @@
         android:divider="@color/gary_light"
         android:layout_below="@id/layout_top"
         />
-    <include
-        android:id="@id/layout_top"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/inc_top"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        />
+
 </RelativeLayout>

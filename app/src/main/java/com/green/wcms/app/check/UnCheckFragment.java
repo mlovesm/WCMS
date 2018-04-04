@@ -3,10 +3,14 @@ package com.green.wcms.app.check;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -39,12 +43,11 @@ import retrofit2.Response;
 public class UnCheckFragment extends Fragment{
     private static final String TAG = "UnCheckFragment";
     private ProgressDialog pDlalog = null;
+    private String title;
 
     private ArrayList<HashMap<String,Object>> arrayList;
     private CheckAdapter mAdapter;
     @Bind(R.id.listView1) ListView listView;
-    @Bind(R.id.top_title) TextView textTitle;
-//    @Bind(R.id.top_text) TextView topText;
 
     @Bind(R.id.search_top) LinearLayout layout;
     @Bind(R.id.textButton1) TextView tv_button1;
@@ -57,6 +60,14 @@ public class UnCheckFragment extends Fragment{
     private boolean isSdate=false;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        title= getArguments().getString("title");
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.check_list, container, false);
         ButterKnife.bind(this, view);
@@ -64,10 +75,6 @@ public class UnCheckFragment extends Fragment{
         user_auth= pref.getValue("user_auth", 0);
         use_part1= pref.getValue("use_part1", "");
         UtilClass.logD(TAG, "use_part1="+use_part1);
-
-        textTitle.setText(getArguments().getString("title"));
-        view.findViewById(R.id.search_top).setVisibility(View.GONE);
-        view.findViewById(R.id.top_search).setVisibility(View.VISIBLE);
 
         tv_button1.setText(UtilClass.getCurrentDate(2));
         tv_button2.setText(UtilClass.getCurrentDate(1));
@@ -80,6 +87,24 @@ public class UnCheckFragment extends Fragment{
 
         return view;
     }//onCreateView
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_write, menu);
+        menu.findItem(R.id.action_write).setVisible(false);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_write) {
+
+        }else if (item.getItemId() == R.id.action_search) {
+            UtilClass.getSearch(layout);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public void async_progress_dialog(){
         RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
@@ -185,26 +210,11 @@ public class UnCheckFragment extends Fragment{
     };
 
 
-    @OnClick(R.id.top_search)
-    public void getSearch() {
-        if(layout.getVisibility()==View.GONE){
-            layout.setVisibility(View.VISIBLE);
-            layout.setFocusable(true);
-        }else{
-            layout.setVisibility(View.GONE);
-        }
-    }
-
     //해당 검색값 데이터 조회
     @OnClick(R.id.imageView1)
     public void onSearchColumn() {
         async_progress_dialog();
 
-    }
-
-    @OnClick(R.id.top_home)
-    public void goHome() {
-        UtilClass.goHome(getActivity());
     }
 
 
@@ -218,12 +228,12 @@ public class UnCheckFragment extends Fragment{
             FragmentManager fm = getFragmentManager();
             FragmentTransaction fragmentTransaction = fm.beginTransaction();
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new UnCheckViewFragment());
-            bundle.putString("title",textTitle.getText()+"상세");
+            bundle.putString("title",title+"상세");
             String key= arrayList.get(position).get("key").toString();
             bundle.putString("equip_no", key);
 
             frag.setArguments(bundle);
-            fragmentTransaction.addToBackStack(textTitle.getText()+"상세");
+            fragmentTransaction.addToBackStack(title+"상세");
             fragmentTransaction.commit();
 
         }

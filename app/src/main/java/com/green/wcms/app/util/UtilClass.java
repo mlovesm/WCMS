@@ -5,11 +5,19 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 
 import com.green.wcms.app.BuildConfig;
+import com.green.wcms.app.R;
 import com.green.wcms.app.menu.MainActivity;
 
 import java.io.File;
@@ -38,6 +46,32 @@ public class UtilClass {
         Intent intent = new Intent(activity, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         activity.startActivity(intent);
+    }
+
+    public static void getSearch(LinearLayout layout) {
+        if(layout.getVisibility()== View.GONE){
+            layout.setVisibility(View.VISIBLE);
+            layout.setFocusable(true);
+        }else{
+            layout.setVisibility(View.GONE);
+        }
+    }
+
+    //Fragment Write 바
+    public static void setToolbar(Activity activity, String title) {
+        Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
+        ((AppCompatActivity)activity).setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) activity.findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                activity, drawer, toolbar, R.string.drawer_open, R.string.drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        final ActionBar actionBar = ((AppCompatActivity)activity).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+        }
     }
 
     //데이터 Null 체크

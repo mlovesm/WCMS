@@ -5,15 +5,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
@@ -25,7 +22,6 @@ import com.green.wcms.app.R;
 import com.green.wcms.app.adaptor.CheckAdapter;
 import com.green.wcms.app.fragment.ActivityResultEvent;
 import com.green.wcms.app.fragment.BaseFragment;
-import com.green.wcms.app.fragment.BusProvider;
 import com.green.wcms.app.retrofit.Datas;
 import com.green.wcms.app.retrofit.RetrofitService;
 import com.green.wcms.app.util.SettingPreference;
@@ -49,16 +45,12 @@ import retrofit2.Response;
 public class CheckApprovalFragment extends BaseFragment implements CheckAdapter.ListBtnClickListener{
     private static final String TAG = "CheckApprovalFragment";
     private ProgressDialog pDlalog = null;
+    private String title;
     final int RESULT_OK=-1;
-
-    private Animation slideUp;
-    private Animation slideDown;
-    private boolean isDown = true;
 
     private ArrayList<HashMap<String,Object>> arrayList;
     private CheckAdapter mAdapter;
     @Bind(R.id.listView1) ListView listView;
-    @Bind(R.id.top_title) TextView textTitle;
 
     @Bind(R.id.search_top) LinearLayout layout;
     @Bind(R.id.textButton1) TextView tv_button1;
@@ -72,6 +64,13 @@ public class CheckApprovalFragment extends BaseFragment implements CheckAdapter.
 
     CheckAdapter.ListBtnClickListener listBtnClickListener ;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        title= getArguments().getString("title");
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -80,16 +79,8 @@ public class CheckApprovalFragment extends BaseFragment implements CheckAdapter.
         pref = new SettingPreference("loginData",getActivity());
         user_auth= pref.getValue("user_auth", 0);
 
-        textTitle.setText(getArguments().getString("title"));
-        view.findViewById(R.id.top_search).setVisibility(View.VISIBLE);
-
         tv_button1.setText(UtilClass.getCurrentDate(2));
         tv_button2.setText(UtilClass.getCurrentDate(1));
-
-//        slideUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_up);
-//        slideUp.setAnimationListener(animationListener);
-//        slideDown = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_down);
-//        slideDown.setAnimationListener(animationListener);
 
         async_progress_dialog();
 
@@ -98,34 +89,23 @@ public class CheckApprovalFragment extends BaseFragment implements CheckAdapter.
         return view;
     }//onCreateView
 
-    public void startAnimation() {
-        isDown = !isDown;
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_write, menu);
+        menu.findItem(R.id.action_write).setVisible(false);
 
-        if (isDown) {
-            layout.startAnimation(slideDown);
-        } else {
-            layout.startAnimation(slideUp);
-        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
-    Animation.AnimationListener animationListener = new Animation.AnimationListener() {
-        @Override
-        public void onAnimationStart(Animation animation) {
-            layout.setVisibility(View.VISIBLE);
-        }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_write) {
 
-        @Override
-        public void onAnimationEnd(Animation animation) {
-            if (!isDown) {
-                layout.setVisibility(View.GONE);
-            }
+        }else if (item.getItemId() == R.id.action_search) {
+            UtilClass.getSearch(layout);
         }
-
-        @Override
-        public void onAnimationRepeat(Animation animation) {
-
-        }
-    };
+        return super.onOptionsItemSelected(item);
+    }
 
     public void async_progress_dialog(){
         RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
@@ -244,26 +224,11 @@ public class CheckApprovalFragment extends BaseFragment implements CheckAdapter.
     };
 
 
-    @OnClick(R.id.top_search)
-    public void getSearch() {
-        if(layout.getVisibility()==View.GONE){
-            layout.setVisibility(View.VISIBLE);
-            layout.setFocusable(true);
-        }else{
-            layout.setVisibility(View.GONE);
-        }
-    }
-
     //해당 검색값 데이터 조회
     @OnClick(R.id.imageView1)
     public void onSearchColumn() {
         async_progress_dialog();
 
-    }
-
-    @OnClick(R.id.top_home)
-    public void goHome() {
-        UtilClass.goHome(getActivity());
     }
 
 
@@ -309,7 +274,7 @@ public class CheckApprovalFragment extends BaseFragment implements CheckAdapter.
         String check_date= arrayList.get(position).get("data1").toString();
 
         Intent intent = new Intent(getActivity(),ApprovalDialogActivity.class);
-        intent.putExtra("title", "점검승인상세");
+        intent.putExtra("title", title+"상세");
         intent.putExtra("chk_no", chk_no);
         intent.putExtra("check_date", check_date);
         intent.putExtra("user_auth", user_auth);

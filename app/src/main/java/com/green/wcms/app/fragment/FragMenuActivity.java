@@ -18,15 +18,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.green.wcms.app.R;
-import com.green.wcms.app.adaptor.CheckAdapter;
 import com.green.wcms.app.check.CheckApprovalFragment;
 import com.green.wcms.app.check.CheckFragment;
 import com.green.wcms.app.check.CheckWriteFragment;
+import com.green.wcms.app.check.TestViewFragment;
 import com.green.wcms.app.check.UnCheckFragment;
 import com.green.wcms.app.draw.DrawFragment;
 import com.green.wcms.app.equipment.EquipmentFragment;
@@ -41,20 +42,14 @@ import com.green.wcms.app.nfc.set.UriRecord;
 import com.green.wcms.app.retrofit.Datas;
 import com.green.wcms.app.retrofit.RetrofitService;
 import com.green.wcms.app.util.BackPressCloseSystem;
-import com.green.wcms.app.util.BadgeClass;
 import com.green.wcms.app.util.SettingPreference;
 import com.green.wcms.app.util.UtilClass;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import butterknife.Bind;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static com.green.wcms.app.nfc.TagSubmitActivity.toHexString;
 
 public class FragMenuActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -74,8 +69,6 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
     private DrawerLayout drawer;
     private FragmentManager fm;
 
-//    @Bind(R.id.top_text) TextView topText;
-
     private BackPressCloseSystem backPressCloseSystem;
 
     @Override
@@ -88,26 +81,25 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
         use_part1= pref.getValue("use_part1", "");
 
         title= getIntent().getStringExtra("title");
-        if(title==null) title= "";
         UtilClass.logD(TAG,"onCreate title="+title);
-
-        async_progress_dialog();
-        onMenuInfo(title);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        async_progress_dialog();
+        onMenuInfo(title);
+
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.drawer_open, R.string.drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-    }//onCreate
 
+    }//onCreate
 
     @Override
     public void onBackPressed() {
@@ -115,6 +107,8 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            getSupportActionBar().setTitle(title);
+
             int fragmentStackCount = fm.getBackStackEntryCount();
             String tag=fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1).getName();
             UtilClass.logD(TAG, "count="+fragmentStackCount+", tag="+tag);
@@ -205,6 +199,8 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
     }
 
     public void onMenuInfo(String title){
+        getSupportActionBar().setTitle(title);
+
         Fragment frag = null;
         Bundle bundle = new Bundle();
 
@@ -223,6 +219,9 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
         }else if(title.equals("도면관리")){
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new DrawFragment());
 
+        }else if(title.equals("테스트")){
+            fragmentTransaction.replace(R.id.fragmentReplace, frag = new TestViewFragment());
+
         }else if(title.equals("MSDS관리")){
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new MsdsFragment());
 
@@ -232,13 +231,7 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
         }else if(title.equals("NFC관리")){
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new SettingActivity());
 
-        }else if(title.equals("NFC점검관리_UPDATE")){
-            fragmentTransaction.replace(R.id.fragmentReplace, frag = new CheckWriteFragment());
-            bundle.putString("check_date",getIntent().getStringExtra("check_date"));
-            bundle.putString("chk_no",getIntent().getStringExtra("chk_no"));
-            bundle.putString("mode",getIntent().getStringExtra("mode"));
-
-        }else if(title.equals("NFC점검관리_INSERT")){
+        }else if(title.equals("점검관리작성")){
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new CheckWriteFragment());
             bundle.putString("TAG_ID",getIntent().getStringExtra("TAG_ID"));
             bundle.putString("equip_no",getIntent().getStringExtra("equip_no"));
@@ -327,9 +320,9 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
                             if(equip_no.equals("")){
                                 Toast.makeText(getApplicationContext(), "해당 태그에 대한 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
                             }else{
-                                if(pendingIntent.equals("점검관리등록")){
+                                if(pendingIntent.equals("점검관리")){
                                     Intent intent = new Intent(getBaseContext(),FragMenuActivity.class);
-                                    intent.putExtra("title", "NFC점검관리_INSERT");
+                                    intent.putExtra("title", pendingIntent+"작성");
                                     intent.putExtra("TAG_ID",tagValue);
                                     intent.putExtra("equip_no",equip_no);
                                     intent.putExtra("use_part1",use_part1);
@@ -396,6 +389,22 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
             }
         });
         alertDlg.show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_list, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_home) {
+            UtilClass.goHome(this);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

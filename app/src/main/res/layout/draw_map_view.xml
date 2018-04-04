@@ -4,12 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-    <include
-        android:id="@id/layout_top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/inc_top"
-        android:layout_alignParentTop="true"/>
+
     <!--상단 탭위치-->
 
     <LinearLayout

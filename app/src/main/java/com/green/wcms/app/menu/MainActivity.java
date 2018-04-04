@@ -15,14 +15,11 @@ import android.os.Environment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.green.wcms.app.R;
-import com.green.wcms.app.equipment.EquipmentFragment;
-import com.green.wcms.app.equipment.MapsActivity;
 import com.green.wcms.app.fragment.FragMenuActivity;
 import com.green.wcms.app.fragment.NFCMenuActivity;
 import com.green.wcms.app.retrofit.Datas;
@@ -163,7 +160,8 @@ public class MainActivity extends AppCompatActivity {
     @OnClick({R.id.textView1, R.id.textButton1})
     public void getUnCheckList() {
         Intent intent = new Intent(getBaseContext(),FragMenuActivity.class);
-        intent.putExtra("title", "미점검리스트");
+//        intent.putExtra("title", "미점검리스트");
+        intent.putExtra("title", "테스트");
         startActivity(intent);
     }
 
@@ -400,7 +398,30 @@ public class MainActivity extends AppCompatActivity {
         }else{
             Toast.makeText(getApplicationContext(), "최신버전 파일을 다운로드 합니다.", Toast.LENGTH_SHORT).show();
             try {
-                downloadFile("http://w-cms.co.kr:9090/app/apkDown.do?appGubun=wcms_"+latestAppVer+"-debug.apk");
+                permissionlistener = new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted() {
+                        try {
+                            downloadFile("http://w-cms.co.kr:9090/app/apkDown.do?appGubun="+fileNm);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                        Toast.makeText(getApplicationContext(), "권한 거부 목록\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+
+                    }
+                };
+                new TedPermission(getApplicationContext())
+                        .setPermissionListener(permissionlistener)
+                        .setRationaleMessage("파일을 다운받기 위해선 권한이 필요합니다.")
+                        .setDeniedMessage("권한을 확인하세요.\n\n [설정] > [애플리케이션] [해당앱] > [권한]")
+                        .setGotoSettingButtonText("권한확인")
+                        .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .check();
+
             }catch (Exception e){
 
             }

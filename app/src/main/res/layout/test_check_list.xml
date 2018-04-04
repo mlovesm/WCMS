@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout xmlns:card="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:ignore="NamespaceTypo">
 
     <!-- 점검일 조회 -->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,6 +17,7 @@
         android:layout_below="@id/layout_top"
         android:background="@color/white"
        >
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -19,7 +25,6 @@
             android:paddingRight="10dp">
 
             <!-- 조회버튼 -->
-
             <TextView
                 android:layout_width="60dp"
                 android:layout_weight="1"
@@ -104,13 +109,21 @@
 
     </LinearLayout>
 
-    <ListView
-        android:id="@id/listView1"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/search_top"
-        android:divider="@color/white"
-        android:background="@drawable/border_top"
-        />
+        android:layout_below="@id/search_top">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+
 
 </RelativeLayout>

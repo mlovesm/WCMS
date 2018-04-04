@@ -8,14 +8,10 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.green.wcms.app.R;
-import com.green.wcms.app.menu.MainActivity;
 import com.green.wcms.app.util.UtilClass;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -26,11 +22,7 @@ public class EquipmentViewFragment extends Fragment {
     public static ViewPager viewPager;
     public static int int_items = 2 ;
 
-    @Bind(R.id.top_title) TextView textTitle;
-
     private String idx="";
-
-    private AQuery aq = new AQuery(getActivity());
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -71,7 +63,6 @@ public class EquipmentViewFragment extends Fragment {
             }
         });
 
-        textTitle.setText(getArguments().getString("title"));
         idx= getArguments().getString("equip_no");
 
         return view;
@@ -123,9 +114,4 @@ public class EquipmentViewFragment extends Fragment {
         }
     }
 
-
-    @OnClick(R.id.top_home)
-    public void goHome() {
-        UtilClass.goHome(getActivity());
-    }
 }

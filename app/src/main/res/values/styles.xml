@@ -19,7 +19,7 @@
     </style>
 
     <!-- Application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
@@ -32,5 +32,17 @@
 
     <style name="PreferenceLocalTheme" parent="@style/PreferenceThemeOverlay" >
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Toolbar" parent="AppTheme">
+        <!-- Toolbar Title Color -->
+        <item name="android:textColorPrimary">@android:color/white</item>
+
+        <!-- Toolbar Up Button Color -->
+        <item name="android:textColorSecondary">@android:color/white</item>
+    </style>
+    
 </resources>

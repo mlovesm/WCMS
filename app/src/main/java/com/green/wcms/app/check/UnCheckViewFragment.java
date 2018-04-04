@@ -8,14 +8,11 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.green.wcms.app.R;
 import com.green.wcms.app.util.UtilClass;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class UnCheckViewFragment extends Fragment {
     private static final String TAG = "UnCheckViewFragment";
@@ -23,8 +20,6 @@ public class UnCheckViewFragment extends Fragment {
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
     public static int int_items = 2 ;
-
-    @Bind(R.id.top_title) TextView textTitle;
 
     private String idx="";
 
@@ -67,7 +62,6 @@ public class UnCheckViewFragment extends Fragment {
             }
         });
 
-        textTitle.setText(getArguments().getString("title"));
         idx= getArguments().getString("equip_no");
 
         return view;
@@ -121,8 +115,4 @@ public class UnCheckViewFragment extends Fragment {
     }
 
 
-    @OnClick(R.id.top_home)
-    public void goHome() {
-        UtilClass.goHome(getActivity());
-    }
 }

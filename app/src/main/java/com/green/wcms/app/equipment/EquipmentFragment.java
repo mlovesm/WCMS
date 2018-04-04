@@ -10,10 +10,14 @@ import android.nfc.NfcAdapter;
 import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -45,12 +49,12 @@ import retrofit2.Response;
 public class EquipmentFragment extends Fragment {
     private static final String TAG = "EquipmentFragment";
     private RetrofitService service;
+    private String title;
     private ProgressDialog pDlalog = null;
 
     private ArrayList<HashMap<String,Object>> arrayList;
     private EquipmentAdapter mAdapter;
     @Bind(R.id.listView1) ListView listView;
-    @Bind(R.id.top_title) TextView textTitle;
 
     @Bind(R.id.search_top) LinearLayout layout;
     @Bind(R.id.editText1) EditText et_search;
@@ -63,13 +67,20 @@ public class EquipmentFragment extends Fragment {
     private String[][] mTechLists;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        service = RetrofitService.rest_api.create(RetrofitService.class);
+        title= getArguments().getString("title");
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.equipment_list, container, false);
         ButterKnife.bind(this, view);
 
-        service = RetrofitService.rest_api.create(RetrofitService.class);
-        textTitle.setText(getArguments().getString("title"));
-        view.findViewById(R.id.top_search).setVisibility(View.VISIBLE);
         layout.setVisibility(View.GONE);
 
         async_progress_dialog();
@@ -104,6 +115,24 @@ public class EquipmentFragment extends Fragment {
 
         return view;
     }//onCreateView
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_write, menu);
+        menu.findItem(R.id.action_write).setVisible(false);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_write) {
+
+        }else if (item.getItemId() == R.id.action_search) {
+            UtilClass.getSearch(layout);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public void alertDialog(){
         final android.app.AlertDialog.Builder alertDlg = new android.app.AlertDialog.Builder(getActivity());
@@ -186,16 +215,6 @@ public class EquipmentFragment extends Fragment {
         });
     }
 
-    @OnClick(R.id.top_search)
-    public void getSearch() {
-        if(layout.getVisibility()==View.GONE){
-            layout.setVisibility(View.VISIBLE);
-            layout.setFocusable(true);
-        }else{
-            layout.setVisibility(View.GONE);
-        }
-    }
-
     //해당 검색값 데이터 조회
     @OnClick(R.id.imageView1)
     public void onSearchColumn() {
@@ -211,11 +230,6 @@ public class EquipmentFragment extends Fragment {
 
     }
 
-    @OnClick(R.id.top_home)
-    public void goHome() {
-        UtilClass.goHome(getActivity());
-    }
-
 
     //ListView의 item (상세)
     private class ListViewItemClickListener implements AdapterView.OnItemClickListener {
@@ -227,12 +241,12 @@ public class EquipmentFragment extends Fragment {
             FragmentManager fm = getFragmentManager();
             FragmentTransaction fragmentTransaction = fm.beginTransaction();
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new EquipmentViewFragment());
-            bundle.putString("title","장치관리상세");
+            bundle.putString("title",title+"상세");
             String key= arrayList.get(position).get("key").toString();
             bundle.putString("equip_no", key);
 
             frag.setArguments(bundle);
-            fragmentTransaction.addToBackStack("장치관리상세");
+            fragmentTransaction.addToBackStack(title+"상세");
             fragmentTransaction.commit();
         }
     }

@@ -7,11 +7,17 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -74,7 +80,6 @@ public class CheckWriteFragment extends Fragment {
     @Bind(R.id.date_button) TextView tvData1;
     @Bind(R.id.stime_button) TextView tvData2;
     @Bind(R.id.etime_button) TextView tvData3;
-    @Bind(R.id.top_title) TextView textTitle;
     @Bind(R.id.spinner1) Spinner spn_usePart1;
     @Bind(R.id.spinner2) Spinner spn_usePart2;
     @Bind(R.id.spinner3) Spinner spn_equip;
@@ -126,18 +131,24 @@ public class CheckWriteFragment extends Fragment {
 
     private RetrofitService service;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mode= getArguments().getString("mode");
+        setHasOptionsMenu(true);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.check_write, container, false);
         ButterKnife.bind(this, view);
+        UtilClass.setToolbar(getActivity(), getArguments().getString("title"));
 
         mode= getArguments().getString("mode");
         scheck_date= getArguments().getString("scheck_date");
         echeck_date= getArguments().getString("echeck_date");
 
-        textTitle.setText(getArguments().getString("title"));
-        view.findViewById(R.id.top_write).setVisibility(View.VISIBLE);
 
         service = RetrofitService.rest_api.create(RetrofitService.class);
 
@@ -149,7 +160,6 @@ public class CheckWriteFragment extends Fragment {
         if(mode.equals("insert")){
             view.findViewById(R.id.linear2).setVisibility(View.GONE);
             userId= MainActivity.loginUserId;
-            textTitle.setText("점검관리작성");
             key_check_date= " ";
             chk_no=" ";
 
@@ -169,7 +179,6 @@ public class CheckWriteFragment extends Fragment {
 
         }else if(mode.equals("update")){
             isCheckD= true;
-            textTitle.setText("점검관리수정");
             key_check_date = getArguments().getString("check_date");
             chk_no= getArguments().getString("chk_no");
             async_progress_dialog("getCheckMInfo");
@@ -261,6 +270,21 @@ public class CheckWriteFragment extends Fragment {
 
         return view;
     }//onCreateView
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_save, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_save) {
+            alertDialogSave();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onDestroy() {
@@ -661,7 +685,7 @@ public class CheckWriteFragment extends Fragment {
         }
     };
 
-    @OnClick({R.id.textButton1, R.id.top_save})
+    @OnClick(R.id.textButton1)
     public void alertDialogSave(){
         if(MainActivity.loginUserId.equals(userId)){
             if(isCheckD){
@@ -894,9 +918,5 @@ public class CheckWriteFragment extends Fragment {
         }
     }
 
-    @OnClick(R.id.top_home)
-    public void goHome() {
-        UtilClass.goHome(getActivity());
-    }
 
 }
