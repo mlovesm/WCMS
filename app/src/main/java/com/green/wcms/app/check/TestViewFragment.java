@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -18,10 +17,15 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -82,15 +86,19 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
     private static final String TAG = "TestViewFragment";
     private ProgressDialog pDlalog = null;
 
-    @Bind(R.id.fab) FloatingActionButton fab;
+    private Animation slideUp;
+    private Animation slideDown;
+    private boolean isDown = false;
+
+    @Bind(R.id.imageView1) ImageView exButton;
+    @Bind(R.id.linearTop) LinearLayout layout;
+    @Bind(R.id.tabHost1) TabHost tabHost;
+    @Bind(android.R.id.tabcontent) FrameLayout frameLayout;
+    @Bind(R.id.fab_menu) FloatingActionMenu fab;
     @Bind(R.id.fab1) FloatingActionButton fab1;
     @Bind(R.id.fab2) FloatingActionButton fab2;
 
-    private Boolean isFabOpen = false;
-    private Animation fab_open,fab_close,rotate_forward,rotate_backward;
-
     private GoogleMap mMap;
-//    private MapView mapView = null;
     @Bind(R.id.map_view) MapView mapView;
     private MarkerOptions[] mMarkerArray;
     private LatLng[] markerPoint;
@@ -104,6 +112,137 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_bestfood_map, container, false);
+        ButterKnife.bind(this, view);
+
+        slideUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_up);
+        slideUp.setAnimationListener(animationListener);
+        slideDown = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_down);
+        slideDown.setAnimationListener(animationListener);
+
+        tabHost.setup();
+
+        TabHost.TabSpec tab1 = tabHost.newTabSpec("1").setContent(R.id.content1).setIndicator("탭1");
+        TabHost.TabSpec tab2 = tabHost.newTabSpec("2").setContent(R.id.content2).setIndicator("탭2");
+        TabHost.TabSpec tab3 = tabHost.newTabSpec("3").setContent(R.id.content3).setIndicator("탭3");
+
+        tabHost.addTab(tab1);
+        tabHost.addTab(tab2);
+        tabHost.addTab(tab3);
+
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String s) {
+
+                switch (s) {
+                    case "1":
+                        frameLayout.setBackgroundColor(Color.parseColor("#FFFFbb33"));
+                        break;
+                    case "2":
+                        frameLayout.setBackgroundColor(Color.parseColor("#ff00ddff"));
+                        break;
+                    case "3":
+                        frameLayout.setBackgroundColor(Color.parseColor("#ff00ddff"));
+                        break;
+
+                }
+
+            }
+        });
+
+        fab.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
+            @Override
+            public void onMenuToggle(boolean opened) {
+                if (opened) {
+
+                } else {
+
+                }
+            }
+        });
+
+//        idx= getArguments().getString("draw_cd");
+        idx= "2";
+        async_progress_dialog();
+
+        mapView.getMapAsync(this);
+
+        return view;
+    }//onCreateView
+
+    public void startAnimation() {
+        isDown = !isDown;
+
+        if (isDown) {
+            layout.startAnimation(slideDown);
+            exButton.setImageResource(R.drawable.circle_minus);
+        } else {
+            layout.startAnimation(slideUp);
+            exButton.setImageResource(R.drawable.circle_plus);
+        }
+    }
+
+    Animation.AnimationListener animationListener = new Animation.AnimationListener() {
+        @Override
+        public void onAnimationStart(Animation animation) {
+            layout.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onAnimationEnd(Animation animation) {
+            if (!isDown) {
+                layout.setVisibility(View.GONE);
+            }
+        }
+
+        @Override
+        public void onAnimationRepeat(Animation animation) {
+
+        }
+    };
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        //액티비티가 처음 생성될 때 실행되는 함수
+        if(mapView != null) {
+            mapView.onCreate(savedInstanceState);
+        }
     }
 
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
@@ -159,117 +298,13 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
             String snippet = marker.getSnippet();
             TextView snippetUi = ((TextView) view.findViewById(R.id.snippet));
 
-                SpannableString snippetText = new SpannableString(snippet);
+            SpannableString snippetText = new SpannableString(snippet);
 //                snippetText.setSpan(new ForegroundColorSpan(Color.MAGENTA), 0, 10, 0);
 //                snippetText.setSpan(new ForegroundColorSpan(Color.BLUE), 12, snippet.length(), 0);
-                snippetUi.setText(snippetText);
+            snippetUi.setText(snippetText);
 
 //                snippetUi.setText("");
 
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_bestfood_map, container, false);
-        ButterKnife.bind(this, view);
-
-        fab_open = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_open);
-        fab_close = AnimationUtils.loadAnimation(getActivity(),R.anim.fab_close);
-        rotate_forward = AnimationUtils.loadAnimation(getActivity(),R.anim.rotate_forward);
-        rotate_backward = AnimationUtils.loadAnimation(getActivity(),R.anim.rotate_backward);
-
-//        textTitle.setText(getArguments().getString("title"));
-//        idx= getArguments().getString("draw_cd");
-        idx= "2";
-        async_progress_dialog();
-
-        mapView.getMapAsync(this);
-
-        return view;
-    }//onCreateView
-
-    @OnClick({R.id.fab, R.id.fab1, R.id.fab2})
-    public void flotingAction(View v){
-        int id = v.getId();
-        switch (id){
-            case R.id.fab:
-
-                animateFAB();
-                break;
-            case R.id.fab1:
-
-                Log.d("Raj", "Fab 1");
-                break;
-            case R.id.fab2:
-
-                Log.d("Raj", "Fab 2");
-                break;
-        }
-    }
-
-    public void animateFAB(){
-
-        if(isFabOpen){
-
-            fab.startAnimation(rotate_backward);
-            fab1.startAnimation(fab_close);
-            fab2.startAnimation(fab_close);
-            fab1.setClickable(false);
-            fab2.setClickable(false);
-            isFabOpen = false;
-            Log.d("Raj", "close");
-
-        } else {
-
-            fab.startAnimation(rotate_forward);
-            fab1.startAnimation(fab_open);
-            fab2.startAnimation(fab_open);
-            fab1.setClickable(true);
-            fab2.setClickable(true);
-            isFabOpen = true;
-            Log.d("Raj","open");
-
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mapView.onLowMemory();
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        //액티비티가 처음 생성될 때 실행되는 함수
-        if(mapView != null) {
-            mapView.onCreate(savedInstanceState);
         }
     }
 
@@ -283,6 +318,27 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
 
+    }
+
+    @OnClick(R.id.imageView1)
+    public void expandableView() {
+        startAnimation();
+    }
+
+
+    @OnClick({R.id.fab1, R.id.fab2})
+    public void flotingAction(View v){
+        int id = v.getId();
+        switch (id){
+            case R.id.fab1:
+
+                Log.d("Raj", "Fab 1");
+                break;
+            case R.id.fab2:
+
+                Log.d("Raj", "Fab 2");
+                break;
+        }
     }
 
     public void async_progress_dialog(){
