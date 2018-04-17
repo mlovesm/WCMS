@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <!-- 방제 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="42dp">
+
+                <TextView
+                    android:id="@+id/textView13"
+                    android:layout_width="130dp"
+                    android:layout_height="match_parent"
+                    android:ellipsize="end"
+                    android:gravity="center|left"
+                    android:paddingLeft="16dp"
+                    android:text="방제약품"
+                    android:textColor="@color/font_333"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView14"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="6dp"
+                    android:ellipsize="end"
+                    android:gravity="center|left"
+                    android:maxLines="1"
+                    android:text="건사, 건토, 비가연성물질"
+                    android:textColor="@color/font_333"
+                    android:textSize="14sp" />
+            </LinearLayout>
+            <!-- 라인 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0.6dip"
+                android:background="@color/gary_line" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="42dp">
+
+                <TextView
+                    android:id="@+id/textView15"
+                    android:layout_width="130dp"
+                    android:layout_height="match_parent"
+                    android:ellipsize="end"
+                    android:gravity="center|left"
+                    android:paddingLeft="16dp"
+                    android:text="방제도구"
+                    android:textColor="@color/font_333"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView16"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="6dp"
+                    android:ellipsize="end"
+                    android:gravity="center|left"
+                    android:maxLines="1"
+                    android:text="양압의 자극시 공기호흡기, 내화학성 보호복"
+                    android:textColor="@color/font_333"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

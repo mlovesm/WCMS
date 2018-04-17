@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/yellow2_main"
+    android:background="@drawable/gradient_orange"
     android:gravity="center_vertical|center_horizontal"
     android:weightSum="1"
     >
@@ -13,51 +13,197 @@
         android:layout_width="match_parent"
         android:layout_height="400dp"
         android:layout_weight="0.1"
-        android:background="@drawable/main_bg_top"
         android:gravity="center"
-        android:orientation="vertical"
-        android:paddingBottom="10dp"
-        android:paddingTop="15dp">
+        android:orientation="horizontal"
+        android:paddingTop="16dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        >
+        <!-- 미점검리스트-->
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:foreground="?android:attr/selectableItemBackground"
+            card_view:cardCornerRadius="@dimen/cardview_round_box"
+            card_view:cardUseCompatPadding="true">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="110dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
-                android:src="@drawable/main_ic_alam" />
-
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="@color/white"
-                android:textSize="120sp" />
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:background="@color/maincolor_y">
+
+                    <ImageView
+                        android:id="@+id/mainImage1"
+                        android:layout_width="match_parent"
+                        android:layout_height="130dp"
+                        android:paddingTop="10dp"
+                        android:src="@drawable/main_uncheck" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_below="@+id/mainImage1"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center_horizontal">
+
+                        <TextView
+                            android:id="@+id/textView1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="74sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="건"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="26sp" />
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/border_bottom_item">
+
+                    <TextView
+                        android:id="@+id/textButton1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center|center_vertical"
+                        android:padding="6dp"
+                        android:text="미점검 리스트"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:foreground="?android:attr/selectableItemBackground"
+            card_view:cardCornerRadius="@dimen/cardview_round_box"
+            card_view:cardUseCompatPadding="true">
+            <!-- 사고상태: 양호-->
+            <LinearLayout
+                android:id="@+id/statusImage1"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="건"
-                android:textColor="@color/white"
-                android:textSize="30sp" />
-        </LinearLayout>
+                android:orientation="vertical"
+                >
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:background="@drawable/gradient_bluegreen">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/main_img_alam"
-            android:padding="6dp"
-            android:text="미점검 리스트"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:id="@+id/textButton1" />
+                    <ImageView
+                        android:id="@+id/mainImage2"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:paddingTop="10dp"
+                        android:src="@drawable/main_good" />
+
+                    <Button
+                        android:id="@id/button1"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_below="@+id/mainImage2"
+                        android:layout_margin="16dp"
+                        android:background="@drawable/box_white"
+                        android:padding="4dp"
+                        android:text="양호"
+                        android:textColor="@color/green_m"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/border_bottom_item">
+
+                    <TextView
+                        android:id="@+id/textButton2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center|center_vertical"
+                        android:padding="6dp"
+                        android:text="사고상태 (현재)"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+            </LinearLayout><!-- /.사고상태: 양호-->
+
+            <!-- 사고상태: 사고-->
+            <LinearLayout
+                android:id="@+id/statusImage2"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:background="@color/colorPrimary">
+
+                    <ImageView
+                        android:id="@+id/mainImage2"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:paddingTop="10dp"
+                        android:src="@drawable/main_accident" />
+
+                    <Button
+                        android:id="@id/button1"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_below="@+id/mainImage2"
+                        android:layout_margin="16dp"
+                        android:background="@drawable/box_white"
+                        android:padding="4dp"
+                        android:text="긴급사고"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/border_bottom_item">
+
+                    <TextView
+                        android:id="@+id/textButton2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center|center_vertical"
+                        android:padding="6dp"
+                        android:text="사고상태 (현재)"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+            </LinearLayout><!-- /.사고상태:사고-->
+
+        </android.support.v7.widget.CardView>
 
     </LinearLayout>
 
@@ -67,7 +213,7 @@
         android:layout_height="match_parent"
         android:layout_weight="0.45"
         android:orientation="horizontal"
-        android:paddingTop="20dp"
+        android:paddingTop="10dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         >
@@ -82,7 +228,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/main_ic_gear" />
+                android:src="@drawable/ic_main01" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -106,7 +252,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/main_ic_map" />
+                android:src="@drawable/ic_main02" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -129,7 +275,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/main_ic_msds" />
+                android:src="@drawable/ic_main03" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -163,7 +309,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/main_ic_check" />
+                android:src="@drawable/ic_main04" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -185,9 +331,10 @@
             >
 
             <ImageView
+                android:id="@+id/imageView12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/main_ic_nfc" />
+                android:src="@drawable/ic_main05" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -210,7 +357,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/main_ic_uncheck" />
+                android:src="@drawable/ic_main06" />
 
             <TextView
                 android:layout_width="wrap_content"

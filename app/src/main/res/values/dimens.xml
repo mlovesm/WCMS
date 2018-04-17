@@ -33,4 +33,5 @@
     <dimen name="text_size_large2">22sp</dimen>
 
     <dimen name="cardview_round_basic">4dp</dimen>
+    <dimen name="cardview_round_box">8dp</dimen>
 </resources>

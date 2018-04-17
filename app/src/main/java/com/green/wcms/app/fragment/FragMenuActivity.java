@@ -219,7 +219,7 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
         }else if(title.equals("도면관리")){
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new DrawFragment());
 
-        }else if(title.equals("테스트")){
+        }else if(title.equals("사고발생")){
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new TestViewFragment());
 
         }else if(title.equals("MSDS관리")){

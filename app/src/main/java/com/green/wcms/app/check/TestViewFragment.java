@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
@@ -116,8 +118,10 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_bestfood_map, container, false);
+        View view = inflater.inflate(R.layout.danger_map, container, false);
         ButterKnife.bind(this, view);
+
+        layout.setVisibility(View.GONE);
 
         slideUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_up);
         slideUp.setAnimationListener(animationListener);
@@ -126,29 +130,25 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
 
         tabHost.setup();
 
-        TabHost.TabSpec tab1 = tabHost.newTabSpec("1").setContent(R.id.content1).setIndicator("탭1");
-        TabHost.TabSpec tab2 = tabHost.newTabSpec("2").setContent(R.id.content2).setIndicator("탭2");
-        TabHost.TabSpec tab3 = tabHost.newTabSpec("3").setContent(R.id.content3).setIndicator("탭3");
+        TabHost.TabSpec tab1 = tabHost.newTabSpec("0").setContent(R.id.content1).setIndicator("사고설비");
+        TabHost.TabSpec tab2 = tabHost.newTabSpec("1").setContent(R.id.content2).setIndicator("대응차량");
+        TabHost.TabSpec tab3 = tabHost.newTabSpec("2").setContent(R.id.content3).setIndicator("방제");
 
         tabHost.addTab(tab1);
         tabHost.addTab(tab2);
         tabHost.addTab(tab3);
 
+        tabHost.setCurrentTab(0);
+
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             @Override
             public void onTabChanged(String s) {
-
+//                tabHost.getTabWidget().getChildAt(Integer.parseInt(s)).setBackgroundColor(Color.MAGENTA);
                 switch (s) {
                     case "1":
-                        frameLayout.setBackgroundColor(Color.parseColor("#FFFFbb33"));
                         break;
-                    case "2":
-                        frameLayout.setBackgroundColor(Color.parseColor("#ff00ddff"));
+                    default:
                         break;
-                    case "3":
-                        frameLayout.setBackgroundColor(Color.parseColor("#ff00ddff"));
-                        break;
-
                 }
 
             }
@@ -164,6 +164,7 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
                 }
             }
         });
+        fab.setClosedOnTouchOutside(true);
 
 //        idx= getArguments().getString("draw_cd");
         idx= "2";
@@ -179,10 +180,10 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
 
         if (isDown) {
             layout.startAnimation(slideDown);
-            exButton.setImageResource(R.drawable.circle_minus);
+            exButton.setImageResource(R.drawable.ic_stop);
         } else {
             layout.startAnimation(slideUp);
-            exButton.setImageResource(R.drawable.circle_plus);
+            exButton.setImageResource(R.drawable.ic_more);
         }
     }
 
@@ -331,8 +332,20 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
         int id = v.getId();
         switch (id){
             case R.id.fab1:
-
                 Log.d("Raj", "Fab 1");
+                Fragment frag = null;
+                Bundle bundle = new Bundle();
+
+                FragmentManager fm = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fm.beginTransaction();
+                fragmentTransaction.replace(R.id.fragmentReplace, frag = new DangerReportFragment());
+                bundle.putString("title","사고발생상세");
+                bundle.putString("chk_no", "");
+
+                frag.setArguments(bundle);
+                fragmentTransaction.addToBackStack("사고발생상세");
+                fragmentTransaction.commit();
+                fab.close(true);
                 break;
             case R.id.fab2:
 

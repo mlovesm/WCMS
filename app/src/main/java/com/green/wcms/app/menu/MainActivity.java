@@ -157,11 +157,17 @@ public class MainActivity extends AppCompatActivity {
         backPressCloseSystem.onBackPressed();
     }
 
-    @OnClick({R.id.textView1, R.id.textButton1})
+    @OnClick({R.id.mainImage1, R.id.textView1, R.id.textButton1})
     public void getUnCheckList() {
         Intent intent = new Intent(getBaseContext(),FragMenuActivity.class);
-//        intent.putExtra("title", "미점검리스트");
-        intent.putExtra("title", "테스트");
+        intent.putExtra("title", "미점검리스트");
+        startActivity(intent);
+    }
+
+    @OnClick({R.id.mainImage2, R.id.button1, R.id.textButton2})
+    public void getDangerList() {
+        Intent intent = new Intent(getBaseContext(),FragMenuActivity.class);
+        intent.putExtra("title", "사고발생");
         startActivity(intent);
     }
 

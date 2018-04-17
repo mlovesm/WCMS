@@ -4,12 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/colorPrimary"
+    android:background="@drawable/intro"
     >
+    <ImageView
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/logo_v"
+        />
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:src="@drawable/intro_logo"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/intro_factory"
         android:scaleType="center" />
 </LinearLayout>

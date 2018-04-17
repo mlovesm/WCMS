@@ -23,6 +23,14 @@
     <item type="id" name="linearLayout0">false</item>
     <item type="id" name="linearLayout1">false</item>
     <item type="id" name="linearLayout2">false</item>
+    <item type="id" name="linearLayout3">false</item>
+    <item type="id" name="linearLayout4">false</item>
+    <item type="id" name="linearLayout5">false</item>
+    <item type="id" name="linearLayout6">false</item>
+    <item type="id" name="linearLayout7">false</item>
+    <item type="id" name="linearLayout8">false</item>
+    <item type="id" name="linearLayout9">false</item>
+    <item type="id" name="linearLayout10">false</item>
     <item type="id" name="editText1">false</item>
     <item type="id" name="editText2">false</item>
     <item type="id" name="button1">false</item>
@@ -31,6 +39,7 @@
     <item type="id" name="result_view">false</item>
     <item type="id" name="barcode_image_view">false</item>
     <item type="id" name="status_view">false</item>
+    <item type="id" name="scroll_view">false</item>
     <item type="id" name="imageView1">false</item>
     <item type="id" name="top_line">false</item>
     <item type="id" name="top_title">false</item>
