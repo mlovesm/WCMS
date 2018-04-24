@@ -85,6 +85,11 @@ public class CheckAdapter extends BaseAdapter  implements View.OnClickListener{
 				viewHolder.board_data3 = (TextView)v.findViewById(R.id.textView3);
 				viewHolder.board_data4 = (TextView)v.findViewById(R.id.textView4);
 
+			}else if(name.equals("DangerEquip")){
+				v = inflater.inflate(R.layout.tab_list_item, parent,false);
+				viewHolder.board_data1 = (TextView)v.findViewById(R.id.textView1);
+				viewHolder.board_data2 = (TextView)v.findViewById(R.id.textView2);
+
 			}else{
 				v = inflater.inflate(R.layout.check_list_item01, parent,false);
 				viewHolder.board_data1 = (TextView)v.findViewById(R.id.textView1);
@@ -139,6 +144,10 @@ public class CheckAdapter extends BaseAdapter  implements View.OnClickListener{
 			viewHolder.board_data2.setText(boardList.get(position).get("data2").toString());
 			viewHolder.board_data3.setText(boardList.get(position).get("data3")+type_kor);
 			viewHolder.board_data4.setText(boardList.get(position).get("data4")+type_kor);
+
+		}else if(name.equals("DangerEquip")){
+			viewHolder.board_data1.setText(boardList.get(position).get("data1").toString());
+			viewHolder.board_data2.setText(boardList.get(position).get("data2").toString());
 
 		}else{
 			viewHolder.board_data1.setText(boardList.get(position).get("data1").toString());

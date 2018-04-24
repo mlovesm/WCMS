@@ -27,7 +27,7 @@ import com.green.wcms.app.R;
 import com.green.wcms.app.check.CheckApprovalFragment;
 import com.green.wcms.app.check.CheckFragment;
 import com.green.wcms.app.check.CheckWriteFragment;
-import com.green.wcms.app.check.TestViewFragment;
+import com.green.wcms.app.check.DangerEquipFragment;
 import com.green.wcms.app.check.UnCheckFragment;
 import com.green.wcms.app.draw.DrawFragment;
 import com.green.wcms.app.equipment.EquipmentFragment;
@@ -86,7 +86,6 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        async_progress_dialog();
         onMenuInfo(title);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -220,7 +219,7 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new DrawFragment());
 
         }else if(title.equals("사고발생")){
-            fragmentTransaction.replace(R.id.fragmentReplace, frag = new TestViewFragment());
+            fragmentTransaction.replace(R.id.fragmentReplace, frag = new DangerEquipFragment());
 
         }else if(title.equals("MSDS관리")){
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new MsdsFragment());
@@ -263,39 +262,6 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
 
         fragment.setArguments(bundle);
         fragmentTransaction.commit();
-    }
-
-    public void async_progress_dialog(){
-        RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
-
-        Call<Datas> call = service.listData("Check","unCheckList", use_part1);
-        call.enqueue(new Callback<Datas>() {
-            @Override
-            public void onResponse(Call<Datas> call, Response<Datas> response) {
-                UtilClass.logD(TAG, "response="+response);
-                if (response.isSuccessful()) {
-                    UtilClass.logD(TAG, "isSuccessful="+response.body().toString());
-                    String status= response.body().getStatus();
-                    try {
-//                        topText.setText(String.valueOf(response.body().getCount()));
-//                        BadgeClass.setBadge(getApplicationContext(), response.body().getCount());
-
-                    } catch ( Exception e ) {
-                        e.printStackTrace();
-                        Toast.makeText(getApplicationContext(), "에러코드 UnCheck 1", Toast.LENGTH_SHORT).show();
-                    }
-                }else{
-                    Toast.makeText(getApplicationContext(), "response isFailed", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Datas> call, Throwable t) {
-                UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
-                Toast.makeText(getApplicationContext(), "onFailure Equipment",Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 
     public void nfcTaggingData(){

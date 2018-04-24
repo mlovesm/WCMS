@@ -49,6 +49,12 @@ public interface RetrofitService {
     @GET("{title}/{sub}/{path}")
     Call<Datas> listData(@Path("title") String title, @Path("sub") String sub, @Path(value = "path", encoded = true) String path);
 
+    @GET("{title}/{sub}/{path}")
+    Call<DatasB> listDataB(@Path("title") String title, @Path("sub") String sub, @Path(value = "path", encoded = true) String path);
+
+    @GET("{title}/{sub}")
+    Call<Datas> listDataQuery(@Path("title") String title, @Path("sub") String sub, @Query(value = "msds_id", encoded = true) String msds_id);
+
     @GET("{title}/{sub}/{path}/{path2}")
     Call<Datas> listData(@Path("title") String title, @Path("sub") String sub, @Path("path") String path, @Path(value = "path2", encoded = true) String path2);
 

@@ -22,6 +22,7 @@ import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,11 +39,14 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.green.wcms.app.R;
+import com.green.wcms.app.adaptor.CheckAdapter;
 import com.green.wcms.app.retrofit.Datas;
+import com.green.wcms.app.retrofit.DatasB;
 import com.green.wcms.app.retrofit.RetrofitService;
 import com.green.wcms.app.util.UtilClass;
 
-import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -82,10 +86,10 @@ import retrofit2.Response;
  * 8. onMapReady();
  */
 
-public class TestViewFragment extends Fragment implements OnMapReadyCallback,
+public class DangerEquipFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
-    private static final String TAG = "TestViewFragment";
+    private static final String TAG = "DangerEquipFragment";
     private ProgressDialog pDlalog = null;
 
     private Animation slideUp;
@@ -107,9 +111,24 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
     private LatLngBounds.Builder bounds;
     private Marker lastClicked = null;
 
+    //탭
+    @Bind(R.id.textView1) TextView tvData1;
+    @Bind(R.id.textView2) TextView tvData2;
+    @Bind(R.id.textView3) TextView tvData3;
+    @Bind(R.id.textView4) TextView tvData4;
+
+    private ArrayList<HashMap<String,Object>> arrayList;
+    private CheckAdapter mAdapter;
+    @Bind(R.id.listView1) ListView listView;
+
+    @Bind(R.id.textView5) TextView tvData5;
+    @Bind(R.id.textView6) TextView tvData6;
+
+
     private double latitd= 0.0;
     private double longtd= 0.0;
-    private String idx="";
+    private String msdsId="";
+    private boolean onMakerClick= false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -145,9 +164,17 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
             public void onTabChanged(String s) {
 //                tabHost.getTabWidget().getChildAt(Integer.parseInt(s)).setBackgroundColor(Color.MAGENTA);
                 switch (s) {
-                    case "1":
+                    case "0":
+                        UtilClass.logD(TAG, "탭1");
+                        if(msdsId!="") getTabData1();
                         break;
-                    default:
+                    case "1":
+                        UtilClass.logD(TAG, "탭2");
+                        if(msdsId!="") getTabData2();
+                        break;
+                    case "2":
+                        UtilClass.logD(TAG, "탭3");
+                        if(msdsId!="") getTabData3();
                         break;
                 }
 
@@ -165,10 +192,6 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
             }
         });
         fab.setClosedOnTouchOutside(true);
-
-//        idx= getArguments().getString("draw_cd");
-        idx= "2";
-        async_progress_dialog();
 
         mapView.getMapAsync(this);
 
@@ -354,53 +377,13 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    public void async_progress_dialog(){
-        RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
-
-        Call<Datas> call = service.listData("Equipment","drawInfoList", "drawCd", idx);
-        call.enqueue(new Callback<Datas>() {
-            @Override
-            public void onResponse(Call<Datas> call, Response<Datas> response) {
-                UtilClass.logD(TAG, "response="+response);
-                if (response.isSuccessful()) {
-                    String status= response.body().getStatus();
-
-                    try {
-                        JSONArray jsonArray = new JSONArray(response.body().getList());
-                        for(int i=0; i<jsonArray.length();i++){
-//                            UtilClass.logD(TAG, "jsonArray="+jsonArray.get(i).toString());
-                        }
-                        UtilClass.logD(TAG, "CRUD_DATE="+jsonArray.getJSONObject(0).get("CRUD_DATE").toString());
-//                        UtilClass.logD(TAG, "CRUD_DATE="+UtilClass.jsonDateConverter(jsonArray.getJSONObject(0).get("CRUD_DATE").toString()));
-//                        tv_data1.setText(jsonArray.getJSONObject(0).get("DRAW_CD").toString());
-//                        tv_data2.setText(jsonArray.getJSONObject(0).get("DRAW_NM").toString());
-
-                    } catch ( Exception e ) {
-                        e.printStackTrace();
-                        Toast.makeText(getActivity(), "에러코드 DrawView 1", Toast.LENGTH_SHORT).show();
-                    }
-                }else{
-                    Toast.makeText(getActivity(), "response isFailed", Toast.LENGTH_SHORT).show();
-                }
-                if(pDlalog!=null) pDlalog.dismiss();
-            }
-
-            @Override
-            public void onFailure(Call<Datas> call, Throwable t) {
-                if(pDlalog!=null) pDlalog.dismiss();
-                UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
-                Toast.makeText(getActivity(), "onFailure Draw",Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void getMapData(final GoogleMap mMap){
         RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
 
         pDlalog = new ProgressDialog(getActivity());
         UtilClass.showProcessingDialog(pDlalog);
 
-        Call<Datas> call = service.listData("Equipment","drawInfoView", "drawCd", idx);
+        Call<Datas> call = service.listData("Check","accEquipInfoList");
         call.enqueue(new Callback<Datas>() {
             @Override
             public void onResponse(Call<Datas> call, Response<Datas> response) {
@@ -433,7 +416,8 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
                             markerPoint[i]= position;
 
                             mMarkerArray[i].position(markerPoint[i]);
-                            mMap.addMarker(mMarkerArray[i]);
+                            Marker marker= mMap.addMarker(mMarkerArray[i]);
+                            marker.setTag(Double.valueOf((double) response.body().getList().get(i).get("MSDS_ID")).intValue());
                             bounds.include(new LatLng(latitd, longtd));
 
                         }
@@ -445,7 +429,7 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
 
                     } catch ( Exception e ) {
                         e.printStackTrace();
-                        Toast.makeText(getActivity(), "에러코드 DrawMap 1", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "에러코드 DangerEquip Map 1", Toast.LENGTH_SHORT).show();
                     }
                 }else{
                     Toast.makeText(getActivity(), "response isFailed", Toast.LENGTH_SHORT).show();
@@ -457,14 +441,146 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
             public void onFailure(Call<Datas> call, Throwable t) {
                 if(pDlalog!=null) pDlalog.dismiss();
                 UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
-                Toast.makeText(getActivity(), "onFailure Draw Map",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "onFailure DangerEquip Map",Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
+    public void getTabData1(){
+        RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
+
+        pDlalog = new ProgressDialog(getActivity());
+        UtilClass.showProcessingDialog(pDlalog);
+
+        Call<Datas> call = service.listDataQuery("Check","accEquipInfoList", msdsId);
+        call.enqueue(new Callback<Datas>() {
+            @Override
+            public void onResponse(Call<Datas> call, Response<Datas> response) {
+                UtilClass.logD(TAG, "response="+response);
+                if (response.isSuccessful()) {
+                    UtilClass.logD(TAG, "isSuccessful="+response.body().toString());
+                    String status= response.body().getStatus();
+
+                    try {
+
+                        tvData1.setText(response.body().getList().get(0).get("EQUIP_NM").toString());
+                        tvData2.setText(response.body().getList().get(0).get("MSDS_NM").toString());
+                        tvData3.setText(response.body().getList().get(0).get("MSDS_TYPE").toString());
+
+                    } catch ( Exception e ) {
+                        e.printStackTrace();
+                        Toast.makeText(getActivity(), "에러코드 DangerEquip 1", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(getActivity(), "response isFailed", Toast.LENGTH_SHORT).show();
+                }
+                if(pDlalog!=null) pDlalog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<Datas> call, Throwable t) {
+                if(pDlalog!=null) pDlalog.dismiss();
+                UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
+                Toast.makeText(getActivity(), "onFailure DangerEquip",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void getTabData2(){
+        RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
+
+        pDlalog = new ProgressDialog(getActivity());
+        UtilClass.showProcessingDialog(pDlalog);
+
+        Call<Datas> call = service.listData("Check","accEquipInfoViewCar", msdsId);
+        call.enqueue(new Callback<Datas>() {
+            @Override
+            public void onResponse(Call<Datas> call, Response<Datas> response) {
+                UtilClass.logD(TAG, "response="+response);
+                if (response.isSuccessful()) {
+                    UtilClass.logD(TAG, "isSuccessful="+response.body().toString());
+                    String status= response.body().getStatus();
+
+                    try {
+                        if(response.body().getCount()==0){
+                            Toast.makeText(getActivity(), "데이터가 없습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                        arrayList = new ArrayList<>();
+                        arrayList.clear();
+                        for(int i=0; i<response.body().getList().size();i++){
+                            HashMap<String,Object> hashMap = new HashMap<>();
+                            hashMap.put("key",response.body().getList().get(i).get("CAR_NO").toString());
+                            hashMap.put("data1",response.body().getList().get(i).get("CAR_NB").toString());
+                            hashMap.put("data2",response.body().getList().get(i).get("CAR_NM").toString());
+                            arrayList.add(hashMap);
+                        }
+
+                        mAdapter = new CheckAdapter(getActivity(), arrayList, "DangerEquip");
+                        listView.setAdapter(mAdapter);
+                    } catch ( Exception e ) {
+                        e.printStackTrace();
+                        Toast.makeText(getActivity(), "에러코드 DangerEquip 2", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(getActivity(), "response isFailed", Toast.LENGTH_SHORT).show();
+                }
+                if(pDlalog!=null) pDlalog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<Datas> call, Throwable t) {
+                if(pDlalog!=null) pDlalog.dismiss();
+                UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
+                Toast.makeText(getActivity(), "onFailure DangerEquip 2",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void getTabData3(){
+        RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
+
+        pDlalog = new ProgressDialog(getActivity());
+        UtilClass.showProcessingDialog(pDlalog);
+
+        Call<DatasB> call = service.listDataB("Check","accEquipInfoViewDrug", msdsId);
+        call.enqueue(new Callback<DatasB>() {
+            @Override
+            public void onResponse(Call<DatasB> call, Response<DatasB> response) {
+                UtilClass.logD(TAG, "response="+response);
+                if (response.isSuccessful()) {
+                    UtilClass.logD(TAG, "isSuccessful="+response.body().toString());
+                    String status= response.body().getStatus();
+
+                    try {
+                        tvData5.setText(response.body().getDatasA().get(0).get("DRUG").toString());
+                        tvData6.setText(response.body().getDatasB().get(0).get("KITS").toString());
+
+                    } catch ( Exception e ) {
+                        e.printStackTrace();
+                        Toast.makeText(getActivity(), "에러코드 DangerEquip 3", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(getActivity(), "response isFailed", Toast.LENGTH_SHORT).show();
+                }
+                if(pDlalog!=null) pDlalog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<DatasB> call, Throwable t) {
+                if(pDlalog!=null) pDlalog.dismiss();
+                UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
+                Toast.makeText(getActivity(), "onFailure DangerEquip",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public boolean onMarkerClick(final Marker marker) {
+        onMakerClick= true;
+        msdsId= String.valueOf(marker.getTag());
+        UtilClass.logD(TAG, "tag="+marker.getTag());
+        if(msdsId!="") getTabData1();
 
             // This causes the marker at Perth to bounce into position when it is clicked.
             final Handler handler = new Handler();
@@ -501,7 +617,6 @@ public class TestViewFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-
         Toast.makeText(getActivity(), "Click Info Window="+marker.getSnippet()+", "+marker.getZIndex(), Toast.LENGTH_SHORT).show();
     }
 

@@ -20,7 +20,6 @@
                 android:layout_height="42dp">
 
                 <TextView
-                    android:id="@+id/textView13"
                     android:layout_width="130dp"
                     android:layout_height="match_parent"
                     android:ellipsize="end"
@@ -32,14 +31,11 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textView14"
+                    android:id="@+id/textView5"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="6dp"
-                    android:ellipsize="end"
                     android:gravity="center|left"
-                    android:maxLines="1"
-                    android:text="건사, 건토, 비가연성물질"
                     android:textColor="@color/font_333"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -54,7 +50,6 @@
                 android:layout_height="42dp">
 
                 <TextView
-                    android:id="@+id/textView15"
                     android:layout_width="130dp"
                     android:layout_height="match_parent"
                     android:ellipsize="end"
@@ -66,14 +61,11 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textView16"
+                    android:id="@+id/textView6"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="6dp"
-                    android:ellipsize="end"
                     android:gravity="center|left"
-                    android:maxLines="1"
-                    android:text="양압의 자극시 공기호흡기, 내화학성 보호복"
                     android:textColor="@color/font_333"
                     android:textSize="14sp" />
             </LinearLayout>

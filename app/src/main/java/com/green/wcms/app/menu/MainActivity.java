@@ -15,6 +15,8 @@ import android.os.Environment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
 //    adb shell dumpsys activity activities | findstr "Run"
     private static final String TAG = "MainActivity";
-    public static String ipAddress= "http://w-cms.co.kr:9090";
-//    public static String ipAddress= "http://192.168.0.22:9191";
+//    public static String ipAddress= "http://w-cms.co.kr:9090";
+    public static String ipAddress= "http://192.168.0.22:9191";
     public static String contextPath= "/m_wcms";
     public static String comp_database;
     public static String ori_comp_database;
@@ -76,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
     private int user_auth;
 
     @Bind(R.id.textView1) TextView textView1;
+    @Bind(R.id.textView2) TextView textView2;
+    @Bind(R.id.statusImage1) LinearLayout layout1;
+    @Bind(R.id.statusImage2) LinearLayout layout2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +109,6 @@ public class MainActivity extends AppCompatActivity {
 
         token = FirebaseInstanceId.getInstance().getToken();
         UtilClass.logD(TAG, "Refreshed token: " + token);
-
-        async_progress_dialog();
 
         permissionlistener = new PermissionListener() {
             @Override
@@ -150,6 +153,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        async_progress_dialog();
+        getDangerEquipData();
     }
 
     @Override
@@ -164,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    @OnClick({R.id.mainImage2, R.id.button1, R.id.textButton2})
+    @OnClick({R.id.mainImage2, R.id.textView2, R.id.textButton2})
     public void getDangerList() {
         Intent intent = new Intent(getBaseContext(),FragMenuActivity.class);
         intent.putExtra("title", "사고발생");
@@ -244,6 +249,46 @@ public class MainActivity extends AppCompatActivity {
                     } catch ( Exception e ) {
                         e.printStackTrace();
                         Toast.makeText(getApplicationContext(), "에러코드 UnCheck 1", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(getApplicationContext(), "response isFailed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Datas> call, Throwable t) {
+                UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
+                Toast.makeText(getApplicationContext(), "onFailure UnCheck",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    public void getDangerEquipData(){
+        service = RetrofitService.rest_api.create(RetrofitService.class);
+
+        Call<Datas> call = service.listData("Check","accEquipInfoCount");
+        call.enqueue(new Callback<Datas>() {
+            @Override
+            public void onResponse(Call<Datas> call, Response<Datas> response) {
+                UtilClass.logD(TAG, "response="+response);
+                if (response.isSuccessful()) {
+                    UtilClass.logD(TAG, "isSuccessful="+response.body().toString());
+                    String status= response.body().getStatus();
+                    try {
+                        int count= Double.valueOf((double) response.body().getList().get(0).get("FCNT")).intValue();
+                        if(count>0){
+                            textView2.setText(count+"");
+                            layout2.setVisibility(View.VISIBLE);
+                            layout1.setVisibility(View.GONE);
+                        }else{
+                            layout1.setVisibility(View.VISIBLE);
+                            layout2.setVisibility(View.GONE);
+                        }
+
+                    } catch ( Exception e ) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "에러코드 accEquipInfoCount 1", Toast.LENGTH_SHORT).show();
                     }
                 }else{
                     Toast.makeText(getApplicationContext(), "response isFailed", Toast.LENGTH_SHORT).show();
